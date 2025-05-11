@@ -1,5 +1,58 @@
 version: "3"
 
+services:
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    env_file:
+      - .env
+    hostname: mail 
+    domainname: ${DOMAIN_NAME}
+    labels:
+      - traefik.enable=true
+
+      # These are examples, configure the equivalent for any additional ports you proxy.
+      # Explicit TLS (STARTTLS):
+      - traefik.tcp.routers.mail-smtp.rule=HostSNI(`*`)
+      - traefik.tcp.routers.mail-smtp.tls=true
+      - traefik.tcp.routers.mail-smtp.tls.certresolver=letsencrypt
+      - traefik.tcp.routers.mail-smtp.tls.passthrough=true
+      - traefik.tcp.routers.mail-smtp.entrypoints=mail-smtp
+      - traefik.tcp.routers.mail-smtp.service=mail-smtp
+      - traefik.tcp.services.mail-smtp.loadbalancer.server.port=25
+      - traefik.tcp.services.mail-smtp.loadbalancer.proxyProtocol.version=2
+
+      # Implicit TLS is no different, except for optional HostSNI support:
+      - traefik.tcp.routers.mail-submissions.rule=HostSNI(`*`)
+      - traefik.tcp.routers.mail-submissions.tls=true
+      - traefik.tcp.routers.mail-submissions.tls.certresolver=letsencrypt
+      - traefik.tcp.routers.mail-submissions.tls.passthrough=true
+      - traefik.tcp.routers.mail-submissions.entrypoints=mail-submissions
+      - traefik.tcp.routers.mail-submissions.service=mail-submissions
+      - traefik.tcp.services.mail-submissions.loadbalancer.server.port=465
+      - traefik.tcp.services.mail-submissions.loadbalancer.proxyProtocol.version=2
+      # NOTE: Optionally match by SNI rule, this requires TLS passthrough (not compatible with STARTTLS):
+      #- traefik.tcp.routers.mail-submissions.rule=HostSNI(`mail.example.com`)
+      #- traefik.tcp.routers.mail-submissions.tls.passthrough=true
+    volumes:
+      - ./maildata:/var/mail
+      - ./mailstate:/var/mail-state
+      - ./maillogs:/var/log/mail
+      - ./config:/tmp/docker-mailserver/
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - web
+    environment:
+      - ENABLE_RSPAMD=1
+      - ENABLE_CLAMAV=1
+      - ENABLE_FAIL2BAN=1
+      - ONE_DIR=1
+    restart: unless-stopped
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 0
   
 
 networks:

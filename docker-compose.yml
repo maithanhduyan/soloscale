@@ -28,6 +28,15 @@ services:
       # postgres
       - --entrypoints.postgres.address=:5432
       - --entrypoints.postgres.forwardedHeaders.insecure=true
+      # DMS ports you want to proxy:
+      - --entryPoints.mail-smtp.address=:25
+      - --entryPoints.mail-submission.address=:587
+      - --entryPoints.mail-submissions.address=:465
+      - --entryPoints.mail-imap.address=:143
+      - --entryPoints.mail-imaps.address=:993
+      - --entryPoints.mail-pop3.address=:110
+      - --entryPoints.mail-pop3s.address=:995
+      - --entryPoints.mail-managesieve.address=:4190
       
       # Let's Encrypt
       - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
@@ -40,6 +49,15 @@ services:
       - "8080:8080" # for traefik dashboard
       - "3306:3306" # mysql
       - "5432:5432" # postgres
+      # DMS ports you want to proxy:
+      - "25:25"
+      - "587:587"
+      - "465:465"
+      - "143:143"
+      - "993:993"
+      - "110:110"
+      - "995:995"
+      - "4190:4190"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/acme.json:/letsencrypt/acme.json
