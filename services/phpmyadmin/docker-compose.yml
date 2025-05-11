@@ -13,12 +13,9 @@ services:
       - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
     restart: unless-stopped
     environment:
-      PMA_HOST: mysql # Replace with your MySQL service name
-      PMA_PORT: 3306
-      # PMA_USER: ${MYSQL_USER}
-      # PMA_PASSWORD: ${MYSQL_PASSWORD}
-      # PMA_ABSOLUTE_URI: http://${HOST_NAME}
       PMA_ARBITRARY: 1
+      PMA_HOST: mysql
+      PMA_PORT: 3306
     ports:
       - "8081:80"
     volumes:

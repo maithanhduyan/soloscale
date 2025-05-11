@@ -11,16 +11,18 @@ services:
       - "traefik.tcp.routers.mysql.rule=HostSNI(`*`)"
       - "traefik.tcp.routers.mysql.entrypoints=mysql"
       - "traefik.tcp.routers.mysql.service=mysql"
+      # - "traefik.tcp.routers.mysql.tls=true"
       - "traefik.tcp.services.mysql.loadbalancer.server.port=3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-testdb}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_USER: ${MYSQL_USER:-dbuser}
+      MYSQL_PASSWORD: ${MYSQL_USER:-dbpassword}
+    # ports:
+    #   - "3306:3306"
     volumes:
       - ./data:/var/lib/mysql
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - web
 

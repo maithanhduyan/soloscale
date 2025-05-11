@@ -4,9 +4,12 @@ services:
     container_name: traefik
     env_file: .env
     command:
+      # traefik
       - --api.dashboard=true
       - --api.insecure=true
       - --api.debug=true
+
+      # log
       - --log=true
       - --log.level=INFO
       - --log.filePath=/var/log/traefik/traefik.log
@@ -15,11 +18,16 @@ services:
       # - --providers.file.filename=/dynamic.yml
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
+
+      # http, https
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       # mysql
       - --entrypoints.mysql.address=:3306
       - --entrypoints.mysql.forwardedHeaders.insecure=true
+      # postgres
+      - --entrypoints.postgres.address=:5432
+      - --entrypoints.postgres.forwardedHeaders.insecure=true
       
       # Let's Encrypt
       - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
@@ -30,6 +38,8 @@ services:
       - "80:80" # http
       - "443:443" # https
       - "8080:8080" # for traefik dashboard
+      - "3306:3306" # mysql
+      - "5432:5432" # postgres
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/acme.json:/letsencrypt/acme.json

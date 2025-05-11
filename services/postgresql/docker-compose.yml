@@ -3,10 +3,17 @@ services:
   db:
     image: postgres:17
     container_name: postgresql
+    labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.postgres.rule=HostSNI(`*`)"
+      - "traefik.tcp.routers.postgres.entrypoints=postgres"
+      - "traefik.tcp.routers.postgres.service=postgres"
+      - "traefik.tcp.routers.postgres.tls=true"
+      - "traefik.tcp.services.postgres.loadbalancer.server.port=5432"
     networks:
       - web
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     env_file:
       - .env
     environment:
