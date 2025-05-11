@@ -1,1 +1,6 @@
 *.log
+
+addons/
+conf/odoo.conf
+log/
+web-data/

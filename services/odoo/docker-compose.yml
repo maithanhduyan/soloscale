@@ -1,5 +1,52 @@
 version: "3"
-
+services:
+  odoo:
+    image: odoo:18.0
+    container_name: odoo_18
+    user: "1000:1000" # run as non-root user
+    volumes:
+      - ./addons:/mnt/extra-addons # contain odoo dev modules
+      - ./conf:/etc/odoo # contain config and log
+      - ./web-data:/var/lib/odoo # contain odoo web data
+      - ./log:/var/log/odoo # contain odoo log data
+    # ports:
+    #   - "8069:8069" # web
+    #   - "8072:8072" # live chat
+    restart: always # run as a service
+    env_file:
+      - .env
+    environment:
+      - TZ=UTC
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.odoo.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.routers.odoo.entrypoints=web,websecure"
+      - "traefik.http.routers.odoo.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.odoo.service=odoo"
+      # Route cho HTTP (8069)
+      - "traefik.http.services.odoo.loadbalancer.server.port=8069"
+      # Route cho websocket (8072)
+      - "traefik.http.routers.odoo-ws.rule=Host(`${HOST_NAME}`) && PathPrefix(`/websocket`)"
+      - "traefik.http.routers.odoo-ws.entrypoints=web,websecure"
+      - "traefik.http.routers.odoo-ws.tls.certresolver=letsencrypt"
+      - "traefik.http.services.odoo-ws.loadbalancer.server.port=8072"
+      - "traefik.http.routers.odoo-ws.service=odoo-ws"
+      # HSTS header
+      # - "traefik.http.middlewares.hsts.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.hsts.headers.stsIncludeSubdomains=true"
+      - "traefik.http.routers.odoo.middlewares=hsts"
+      - "traefik.http.routers.odoo-ws.middlewares=hsts"
+      # Gzip compression
+      - "traefik.http.middlewares.gzip.compress=true"
+      - "traefik.http.routers.odoo.middlewares=gzip"
+      - "traefik.http.routers.odoo-ws.middlewares=gzip"
+      # Redirect HTTP to HTTPS
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.odoo.middlewares=redirect-to-https"
+      - "traefik.http.routers.odoo-ws.middlewares=redirect-to-https"
   
 
 networks:
