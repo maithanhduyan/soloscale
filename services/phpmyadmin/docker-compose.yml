@@ -1,0 +1,33 @@
+version: "3"
+services:
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: phpmyadmin
+    env_file:
+      - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.routers.phpmyadmin.entrypoints=web,websecure"
+      - "traefik.http.routers.phpmyadmin.tls.certresolver=letsencrypt"
+      - "traefik.http.services.phpmyadmin.loadbalancer.server.port=80"
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql # Replace with your MySQL service name
+      PMA_PORT: 3306
+      # PMA_USER: ${MYSQL_USER}
+      # PMA_PASSWORD: ${MYSQL_PASSWORD}
+      # PMA_ABSOLUTE_URI: http://${HOST_NAME}
+      PMA_ARBITRARY: 1
+    ports:
+      - "8081:80"
+    volumes:
+      - ./phpmyadmin:/etc/phpmyadmin
+    networks:
+      - web
+  
+
+networks:
+  web:
+    external: true
+  

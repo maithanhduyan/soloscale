@@ -1,0 +1,23 @@
+version: "3"
+services:
+  db:
+    image: postgres:17
+    container_name: postgresql
+    networks:
+      - web
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - TZ=UTC
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    restart: always # run as a service
+
+networks:
+  web:
+    external: true

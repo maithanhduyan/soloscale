@@ -1,0 +1,38 @@
+name: Deploy Static Site from Docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd docs
+          if [ -f package.json ]; then
+            npm install
+          fi
+
+      - name: Build static site
+        run: |
+          cd docs
+          if [ -f package.json ]; then
+            npm run build
+          fi
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/dist

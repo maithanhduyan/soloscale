@@ -1,0 +1,45 @@
+services:
+  traefik:
+    image: traefik:v3.4.0
+    container_name: traefik
+    env_file: .env
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --api.debug=true
+      - --log=true
+      - --log.level=INFO
+      - --log.filePath=/var/log/traefik/traefik.log
+      - --accesslog=true
+      - --accesslog.filePath=/var/log/traefik/access.log
+      # - --providers.file.filename=/dynamic.yml
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      # mysql
+      - --entrypoints.mysql.address=:3306
+      - --entrypoints.mysql.forwardedHeaders.insecure=true
+      
+      # Let's Encrypt
+      - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+    ports:
+      - "80:80" # http
+      - "443:443" # https
+      - "8080:8080" # for traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/acme.json:/letsencrypt/acme.json
+      - ./traefik/log:/var/log/traefik
+    environment:
+      - TZ=UTC
+    restart: unless-stopped
+    networks:
+      - web
+
+networks:
+  web:
+    external: true

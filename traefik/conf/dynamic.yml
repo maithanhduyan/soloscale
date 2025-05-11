@@ -1,0 +1,3 @@
+entryPoints:
+  mysql:
+    address: ":3306"
