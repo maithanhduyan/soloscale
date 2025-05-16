@@ -11,7 +11,6 @@ services:
       - "traefik.http.services.pgadmin.loadbalancer.server.port=80"
       - "traefik.http.routers.pgadmin.entrypoints=web,websecure"
       - "traefik.http.routers.pgadmin.service=pgadmin"
-      - "traefik.http.routers.pgadmin.middlewares=redirect-to-https"
       - "traefik.http.routers.pgadmin.tls.certresolver=letsencrypt"
     volumes:
       - ./pgadmin:/var/lib/pgadmin
