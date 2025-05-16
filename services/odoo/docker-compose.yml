@@ -3,7 +3,6 @@ services:
   odoo:
     image: odoo:18.0
     container_name: odoo_18
-    user: "1000:1000" # run as non-root user
     volumes:
       - ./addons:/mnt/extra-addons # contain odoo dev modules
       - ./conf:/etc/odoo # contain config and log

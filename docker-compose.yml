@@ -5,14 +5,14 @@ services:
     env_file: .env
     command:
       # traefik
-      - --api.dashboard=true
-      - --api.insecure=true
-      - --api.debug=true
+      # - --api.dashboard=true
+      # - --api.insecure=true
+      # - --api.debug=true
 
       # log
-      - --log=true
-      - --log.level=INFO
-      - --log.filePath=/var/log/traefik/traefik.log
+      # - --log=true
+      # - --log.level=ERROR
+      # - --log.filePath=/var/log/traefik/traefik.log
       - --accesslog=true
       - --accesslog.filePath=/var/log/traefik/access.log
       # - --providers.file.filename=/dynamic.yml
@@ -23,20 +23,26 @@ services:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       # mysql
-      - --entrypoints.mysql.address=:3306
-      - --entrypoints.mysql.forwardedHeaders.insecure=true
+      # - --entrypoints.mysql.address=:3306
+      # - --entrypoints.mysql.forwardedHeaders.insecure=true
       # postgres
       - --entrypoints.postgres.address=:5432
       - --entrypoints.postgres.forwardedHeaders.insecure=true
+      #
+      - --entrypoints.web.http3=true
+      - --entrypoints.websecure.http3=true
+      # - --serverstransport.maxidleconnsperhost=100
+      # - --serverstransport.idletimeout=90s
+
       # DMS ports you want to proxy:
-      - --entryPoints.mail-smtp.address=:25
-      - --entryPoints.mail-submission.address=:587
-      - --entryPoints.mail-submissions.address=:465
-      - --entryPoints.mail-imap.address=:143
-      - --entryPoints.mail-imaps.address=:993
-      - --entryPoints.mail-pop3.address=:110
-      - --entryPoints.mail-pop3s.address=:995
-      - --entryPoints.mail-managesieve.address=:4190
+      # - --entryPoints.mail-smtp.address=:25
+      # - --entryPoints.mail-submission.address=:587
+      # - --entryPoints.mail-submissions.address=:465
+      # - --entryPoints.mail-imap.address=:143
+      # - --entryPoints.mail-imaps.address=:993
+      # - --entryPoints.mail-pop3.address=:110
+      # - --entryPoints.mail-pop3s.address=:995
+      # - --entryPoints.mail-managesieve.address=:4190
       
       # Let's Encrypt
       - --certificatesresolvers.letsencrypt.acme.email=${LETSENCRYPT_EMAIL}
@@ -46,18 +52,18 @@ services:
     ports:
       - "80:80" # http
       - "443:443" # https
-      - "8080:8080" # for traefik dashboard
-      - "3306:3306" # mysql
-      - "5432:5432" # postgres
+      # - "8080:8080" # for traefik dashboard
+      # - "3306:3306" # mysql
+      # - "5432:5432" # postgres
       # DMS ports you want to proxy:
-      - "25:25"
-      - "587:587"
-      - "465:465"
-      - "143:143"
-      - "993:993"
-      - "110:110"
-      - "995:995"
-      - "4190:4190"
+      # - "25:25"
+      # - "587:587"
+      # - "465:465"
+      # - "143:143"
+      # - "993:993"
+      # - "110:110"
+      # - "995:995"
+      # - "4190:4190"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/acme.json:/letsencrypt/acme.json
