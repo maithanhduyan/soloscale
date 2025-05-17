@@ -41,7 +41,6 @@ services:
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - TZ=UTC
 
-
 networks:
   web:
     external: true
